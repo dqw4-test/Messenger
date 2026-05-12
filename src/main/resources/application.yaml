@@ -1,8 +1,14 @@
 spring:
   application:
     name: SocialNetwork
+  main:
+    lazy-initialization: true
   config:
     import: optional:file:.env[.properties],optional:file:./config/application-secrets.properties
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:socialnetwork}}
     username: ${DB_USERNAME:socialuser}
@@ -13,7 +19,6 @@ spring:
       ddl-auto: ${JPA_DDL_AUTO:update}
     show-sql: false
     open-in-view: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
