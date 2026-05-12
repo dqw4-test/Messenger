@@ -55,7 +55,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://social-network-api.onrender.com
+        value: https://social-network-api-cywz.onrender.com
 
 databases:
   - name: social-network-db
