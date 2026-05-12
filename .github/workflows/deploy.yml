@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger backend deploy
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND != '' }}
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+
+      - name: Trigger frontend deploy
+        if: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND != '' }}
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
+
+      - name: Wait for rollout
+        if: ${{ secrets.RENDER_HEALTHCHECK_URL != '' }}
+        run: sleep 45
+
+      - name: Healthcheck
+        if: ${{ secrets.RENDER_HEALTHCHECK_URL != '' }}
+        run: curl -fsS "${{ secrets.RENDER_HEALTHCHECK_URL }}"

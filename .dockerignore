@@ -1,0 +1,11 @@
+.git
+.github
+target
+frontend/node_modules
+frontend/dist
+logs
+uploads
+*.jtl
+jmeter-report
+only-429-report
+sync-break-report

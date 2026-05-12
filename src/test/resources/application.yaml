@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+  sql:
+    init:
+      mode: never
+
+app:
+  jwt:
+    issuer: test-social-network
+    access-secret: test-access-secret-test-access-secret
+    refresh-secret: test-refresh-secret-test-refresh-secret
+    access-ttl-minutes: 15
+    refresh-ttl-days: 7
+  storage:
+    upload-dir: /tmp/socialnetwork-test-uploads
