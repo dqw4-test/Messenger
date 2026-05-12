@@ -27,6 +27,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableMethodSecurity
@@ -47,6 +49,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(new JwtAccessDeniedHandler()))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
@@ -78,8 +81,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> allowedOrigins = webCorsProperties.allowedOrigins();
-        configuration.setAllowedOriginPatterns(allowedOrigins == null || allowedOrigins.isEmpty()
+        List<String> allowedOrigins = webCorsProperties.allowedOrigins() == null
+                ? List.of()
+                : webCorsProperties.allowedOrigins().stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .map(value -> {
+                    if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+                        value = value.substring(1, value.length() - 1).trim();
+                    }
+                    if (value.endsWith("/")) {
+                        value = value.substring(0, value.length() - 1);
+                    }
+                    return value;
+                })
+                .filter(value -> !value.isBlank())
+                .collect(Collectors.toList());
+        configuration.setAllowedOriginPatterns(allowedOrigins.isEmpty()
                 ? List.of("*")
                 : allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
