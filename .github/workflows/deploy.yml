@@ -10,17 +10,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger backend deploy
-        if: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND != '' }}
-        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+        env:
+          RENDER_DEPLOY_HOOK_BACKEND: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_BACKEND" ]; then
+            curl -fsS -X POST "$RENDER_DEPLOY_HOOK_BACKEND"
+          else
+            echo "RENDER_DEPLOY_HOOK_BACKEND is not set, skipping"
+          fi
 
       - name: Trigger frontend deploy
-        if: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND != '' }}
-        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
+        env:
+          RENDER_DEPLOY_HOOK_FRONTEND: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_FRONTEND" ]; then
+            curl -fsS -X POST "$RENDER_DEPLOY_HOOK_FRONTEND"
+          else
+            echo "RENDER_DEPLOY_HOOK_FRONTEND is not set, skipping"
+          fi
 
       - name: Wait for rollout
-        if: ${{ secrets.RENDER_HEALTHCHECK_URL != '' }}
-        run: sleep 45
+        env:
+          RENDER_HEALTHCHECK_URL: ${{ secrets.RENDER_HEALTHCHECK_URL }}
+        run: |
+          if [ -n "$RENDER_HEALTHCHECK_URL" ]; then
+            sleep 45
+          else
+            echo "RENDER_HEALTHCHECK_URL is not set, skipping wait"
+          fi
 
       - name: Healthcheck
-        if: ${{ secrets.RENDER_HEALTHCHECK_URL != '' }}
-        run: curl -fsS "${{ secrets.RENDER_HEALTHCHECK_URL }}"
+        env:
+          RENDER_HEALTHCHECK_URL: ${{ secrets.RENDER_HEALTHCHECK_URL }}
+        run: |
+          if [ -n "$RENDER_HEALTHCHECK_URL" ]; then
+            curl -fsS "$RENDER_HEALTHCHECK_URL"
+          else
+            echo "RENDER_HEALTHCHECK_URL is not set, skipping healthcheck"
+          fi
