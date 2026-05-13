@@ -1,4 +1,4 @@
-name: Deploy
+name: CD
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  Deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger backend deploy
@@ -29,6 +29,10 @@ jobs:
             echo "RENDER_DEPLOY_HOOK_FRONTEND is not set, skipping"
           fi
 
+  Healthcheck:
+    needs: Deploy
+    runs-on: ubuntu-latest
+    steps:
       - name: Wait for rollout
         env:
           RENDER_HEALTHCHECK_URL: ${{ secrets.RENDER_HEALTHCHECK_URL }}
